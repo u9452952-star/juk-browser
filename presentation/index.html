@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Juk Browser — быстрый браузер на Electron</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topnav">
+    <div class="wrap nav-in">
+      <div class="brand"><span class="logo">J</span> Juk Browser</div>
+      <nav>
+        <a href="#features">Возможности</a>
+        <a href="#keys">Клавиши</a>
+        <a href="#tech">Технологии</a>
+        <a href="#download" class="btn btn-accent">Скачать</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-text">
+        <h1>Браузер, который мы собрали <em>сами</em></h1>
+        <p class="lead">Быстрый, тёмный, с менеджером паролей, стартовой страницей с обоями и русским интерфейсом. На Electron и Chromium.</p>
+        <div class="hero-cta">
+          <a href="#download" class="btn btn-accent big">Скачать для Windows</a>
+          <a href="#features" class="btn btn-ghost big">Возможности ↓</a>
+        </div>
+        <div class="hero-meta">
+          <span>v1.0.0</span><span>·</span><span>MIT</span><span>·</span><span>Windows / macOS / Linux</span>
+        </div>
+      </div>
+
+      <!-- CSS-макет окна браузера -->
+      <div class="browser-mock" aria-hidden="true">
+        <div class="bm-titlebar">
+          <div class="bm-logo">J</div>
+          <div class="bm-tabs">
+            <div class="bm-tab active"><span class="bm-fav a"></span><span class="bm-t">Новая вкладка</span><svg class="bm-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></div>
+            <div class="bm-tab"><span class="bm-fav b"></span><span class="bm-t">GitHub</span><svg class="bm-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></div>
+          </div>
+          <div class="bm-plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+          <div class="bm-win">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>
+          </div>
+        </div>
+        <div class="bm-toolbar">
+          <span class="bm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></span>
+          <span class="bm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></span>
+          <span class="bm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></span>
+          <span class="bm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 21v-9h6v9"/></svg></span>
+          <div class="bm-omni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>juk://newtab</span><svg class="bm-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.95 5.97 6.6.96-4.78 4.66 1.13 6.58L12 17.57l-5.9 3.1 1.13-6.58L2.45 9.43l6.6-.96z"/></svg></div>
+          <span class="bm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></span>
+          <span class="bm-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>
+        </div>
+        <div class="bm-page">
+          <div class="bm-clock" id="bm-clock">12:34</div>
+          <div class="bm-date" id="bm-date"></div>
+          <div class="bm-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>Поиск в интернете или адрес</div>
+          <div class="bm-tiles">
+            <div class="bm-tile"><i>G</i><span>google</span></div>
+            <div class="bm-tile"><i>G</i><span>github</span></div>
+            <div class="bm-tile"><i>Y</i><span>youtube</span></div>
+            <div class="bm-tile"><i>S</i><span>steam</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <div class="wrap">
+      <h2>Всё, что нужно браузеру</h2>
+      <p class="sub">Собрано вручную, без лишнего.</p>
+      <div class="grid">
+        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><h3>Вкладки</h3><p>Перетаскивание, закрепление, восстановление закрытых, поиск, средний клик, контекстное меню.</p></div>
+        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div><h3>История</h3><p>Страница с группировкой по дням, поиском и очисткой по периодам.</p></div>
+        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.95 5.97 6.6.96-4.78 4.66 1.13 6.58L12 17.57l-5.9 3.1 1.13-6.58L2.45 9.43l6.6-.96z"/></svg></div><h3>Закладки</h3><p>Отдельная страница, панель под адресной строкой, средний клик — новая вкладка.</p></div>
+        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></div><h3>Загрузки</h3><p>Мини-окно с живым прогрессом, скоростью и ETA + полная страница. Автосохранение в «Загрузки».</p></div>
+        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M11 13L20 4"/><path d="M16 8l3 3"/></svg></div><h3>Пароли</h3><p>Менеджер с шифрованием DPAPI, автозаполнение, выбор аккаунта, предложение сохранения.</p></div>
+        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.5h17l-1.6 2.8H5.1L3.5 9.5z"/><path d="M8 9.3c0-2.9 1.7-4.8 4-4.8s4 1.9 4 4.8"/><circle cx="8.2" cy="16.6" r="2.4"/><circle cx="15.8" cy="16.6" r="2.4"/><path d="M10.6 16.6h2.8"/></svg></div><h3>Инкогнито</h3><p>Отдельная тёмная тема окна, без истории, загрузок и cookies после закрытия.</p></div>
+        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-4.5-4.5L6 21"/></svg></div><h3>Стартовая страница</h3><p>Часы, дата, свои обои, круглые плитки сайтов, быстрые ссылки — всё настраивается.</p></div>
+        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg></div><h3>Темы и акцент</h3><p>Светлая/тёмная/системная + акцентный цвет с автоконтрастом. Русский и английский языки.</p></div>
+        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><rect x="12" y="12" width="7" height="5" rx="1"/></svg></div><h3>Картинка в картинке</h3><p>Видео в плавающем окне поверх всех окон — из меню или контекста видео.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="keys" class="section alt">
+    <div class="wrap">
+      <h2>Горячие клавиши</h2>
+      <p class="sub">Как в Chrome — плюс работают в любой раскладке клавиатуры.</p>
+      <table class="keys">
+        <tr><td><kbd>Ctrl</kbd>+<kbd>T</kbd> / <kbd>W</kbd></td><td>Новая вкладка / закрыть</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></td><td>Восстановить вкладку</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>Tab</kbd></td><td>Переключение вкладок</td><td><kbd>Ctrl</kbd>+<kbd>1…9</kbd></td><td>Вкладка по номеру</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>Новое окно</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd></td><td>Окно инкогнито</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>Адресная строка</td><td><kbd>Ctrl</kbd>+<kbd>H</kbd> / <kbd>J</kbd></td><td>История / загрузки</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>Закладка</td><td><kbd>Alt</kbd>+<kbd>←</kbd>/<kbd>→</kbd></td><td>Назад / вперёд</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>+</kbd>/<kbd>−</kbd>/<kbd>0</kbd></td><td>Масштаб</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd></td><td>DevTools</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section id="tech" class="section">
+    <div class="wrap">
+      <h2>Под капотом</h2>
+      <p class="sub">Минимум зависимостей, максимум контроля.</p>
+      <div class="tech-grid">
+        <div class="tech-card"><b>Electron 36</b><span>последний Chromium 136</span></div>
+        <div class="tech-card"><b>WebContentsView</b><span>современный API вкладок</span></div>
+        <div class="tech-card"><b>0 зависимостей</b><span>только dev-сборка</span></div>
+        <div class="tech-card"><b>MIT</b><span>свободная лицензия</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="section alt">
+    <div class="wrap download">
+      <h2>Собрать самому</h2>
+      <p class="sub">Исходники открыты. Требуется Node.js 18+.</p>
+      <pre class="code">npm install
+npm start          # запуск
+npm run dist:win   # установщик + portable</pre>
+      <div class="hero-cta">
+        <a href="https://github.com" class="btn btn-accent big">GitHub репозиторий</a>
+      </div>
+      <p class="fine">Собрано вручную при живой отладке — каждая кнопка отцентрована.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="wrap">Juk Browser · сделано с ❤️ и Electron · 2026</div>
+  </footer>
+
+  <script>
+    // Живые часы в макете
+    const c = document.getElementById('bm-clock');
+    const tick = () => c.textContent = new Date().toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+    tick(); setInterval(tick, 1000);
+    document.querySelector('.bm-date').textContent = new Date().toLocaleDateString('ru', { weekday: 'long', day: 'numeric', month: 'long' });
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+  <title>menu</title>
+  <style>
+    :root{--bg:#fff;--text:#202124;--muted:#71757c;--hover:#2021240b;--accent:#e43d46;--accent-fg:#e43d46;--on-accent:#fff;--accent-soft:#e43d461f;--border:#dfe2e7}
+    @media (prefers-color-scheme:dark){:root{--bg:#292c31;--text:#f3f4f6;--muted:#a9adb5;--hover:#ffffff12;--accent:#ff5a62;--accent-fg:#ff5a62;--on-accent:#fff;--accent-soft:#ff5a6220;--border:#3b3f46}}
+    html,body{margin:0;height:100%;overflow:hidden;background:transparent;font:13px system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
+    body{box-sizing:border-box;padding:12px}
+    .card{box-sizing:border-box;height:100%;background:var(--bg);border:1px solid var(--border);border-radius:14px;box-shadow:0 3px 10px #0003;padding:6px;overflow-y:auto}
+    .card::-webkit-scrollbar{width:0}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:14px;height:30px;padding:0 12px;border-radius:9px;cursor:pointer;user-select:none}
+    .row:hover:not(.disabled){background:var(--hover)}
+    .row.disabled{opacity:.45;cursor:default}
+    .row .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .accel{color:var(--muted);font-size:11px;flex:0 0 auto}
+    .chev{color:var(--muted);font-size:11px}
+    .sep{height:1px;background:var(--border);margin:4px 10px}
+    .back{color:var(--muted);font-weight:600}
+  </style>
+</head>
+<body>
+  <div class="card" id="card"></div>
+<script>
+const esc=(s='')=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let state=null,stack=[];
+function currentItems(){let arr=state.items;for(const i of stack)arr=arr[i].children||[];return arr}
+function render(){
+  const items=currentItems();
+  let html='';
+  if(stack.length)html+=`<div class="row back" data-back="1"><span class="lbl">${esc('‹ '+(state.backLabel||'Назад'))}</span></div>`;
+  html+=items.map((it,i)=>it.sep?'<div class="sep"></div>':`<div class="row${it.enabled===false?' disabled':''}" data-i="${i}"><span class="lbl">${esc(it.label)}</span>${it.children?'<span class="chev">▸</span>':it.accel?`<span class="accel">${esc(it.accel)}</span>`:''}</div>`).join('');
+  document.getElementById('card').innerHTML=html;
+  document.querySelectorAll('.row').forEach(r=>r.onclick=()=>{
+    if(r.dataset.back){stack.pop();render();return}
+    const it=items[Number(r.dataset.i)];
+    if(!it||it.enabled===false)return;
+    if(it.children){stack.push(Number(r.dataset.i));render();return}
+    menu.pick([...stack,Number(r.dataset.i)].join('.'));
+  });
+}
+menu.onState(p=>{
+  const r=document.documentElement.style;
+  if(p.theme)for(const[k,v]of Object.entries({bg:'--bg',text:'--text',muted:'--muted',hover:'--hover',accent:'--accent',accentFg:'--accent-fg',onAccent:'--on-accent',accentSoft:'--accent-soft',border:'--border'}))r.setProperty(v,p.theme[k]);
+  state=p; stack=[]; render();
+});
+menu.ready();
+</script>
+</body>
+</html>

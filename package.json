@@ -1,0 +1,90 @@
+{
+  "name": "juk-browser",
+  "version": "1.0.0",
+  "description": "Кроссплатформенный браузер на Electron",
+  "main": "main.js",
+  "author": "Juk Browser",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check main.js && node --check preload.js && node --check preload-page.js && node --check preload-prompt.js && node --check preload-suggestions.js && node --check preload-downloads.js && node --check preload-menu.js && node --check i18n.js && node --check renderer.js",
+    "lint": "eslint .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "electron": "^36.3.1",
+    "electron-builder": "^26.0.12",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0"
+  },
+  "build": {
+    "appId": "ru.juk.browser",
+    "productName": "Juk Browser",
+    "asar": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "preload-suggestions.js",
+      "preload-page.js",
+      "preload-prompt.js",
+      "preload-downloads.js",
+      "preload-menu.js",
+      "i18n.js",
+      "renderer.js",
+      "index.html",
+      "suggestions.html",
+      "password-prompt.html",
+      "downloads-bubble.html",
+      "menu.html",
+      "toast.html",
+      "styles.css",
+      "package.json",
+      "icon.png"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "juk-browser",
+        "repo": "juk-browser"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "icon.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.utilities",
+      "icon": "icon.png"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Network",
+      "icon": "icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  }
+}

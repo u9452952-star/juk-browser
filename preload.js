@@ -1,0 +1,66 @@
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
+
+const invoke = (channel) => (...args) => ipcRenderer.invoke(channel, ...args);
+const on = (channel, callback) => {
+  const listener = (_event, payload) => callback(payload);
+  ipcRenderer.on(channel, listener);
+  return () => ipcRenderer.removeListener(channel, listener);
+};
+
+contextBridge.exposeInMainWorld('browser', {
+  ready: invoke('app:ready'),
+  newTab: (url,activate)=>ipcRenderer.invoke('tabs:new',url,activate),
+  closeTab: invoke('tabs:close'),
+  switchTab: invoke('tabs:switch'),
+  reorderTabs: invoke('tabs:reorder'),
+  muteTab: invoke('tabs:mute'),
+  navigate: invoke('nav:go'),
+  back: invoke('nav:back'),
+  forward: invoke('nav:forward'),
+  reload: invoke('nav:reload'),
+  stop: invoke('nav:stop'),
+  home: invoke('nav:home'),
+  bookmarkToggle: invoke('bookmarks:toggle'),
+  bookmarkUpdate: invoke('bookmarks:update'),
+  bookmarkRemove: invoke('bookmarks:remove'),
+  getLibrary: invoke('library:get'),
+  clearHistoryRange: invoke('history:clearRange'),
+  removeHistory: invoke('history:remove'),
+  downloadAction: invoke('downloads:action'),
+  downloadRemove: invoke('downloads:remove'),
+  downloadsClear: invoke('downloads:clear'),
+  saveSettings: invoke('settings:save'),
+  clearData: invoke('settings:clearData'),
+  passwordsList: invoke('passwords:list'),
+  passwordsReveal: invoke('passwords:reveal'),
+  passwordsRemove: invoke('passwords:remove'),
+  passwordsAdd: invoke('passwords:add'),
+  newtabGet: invoke('newtab:get'),
+  newtabAdd: invoke('newtab:add'),
+  newtabRemove: invoke('newtab:remove'),
+  newtabHide: invoke('newtab:hideHost'),
+  setWallpaper: invoke('newtab:setWallpaper'),
+  clearWallpaper: invoke('newtab:clearWallpaper'),
+  suggestions: invoke('omnibox:suggestions'),
+  showSuggestions: invoke('omnibox:popup'),
+  hideSuggestions: invoke('omnibox:popupHide'),
+  setToolbarHeight: invoke('window:setToolbarHeight'),
+  showAppMenu: invoke('menu:show'),
+  showTabMenu: invoke('menu:tab'),
+  closeMenus: invoke('menu:closeAll'),
+  openDownloadsFolder: invoke('shell:openDownloads'),
+  downloadsBubble: invoke('dl:toggle'),
+  closeDownloadBubble: invoke('dl:close'),
+  windowControl: invoke('window:control'),
+  toastMsg: invoke('ui:toast'),
+  findRun: invoke('find:run'),
+  findStop: invoke('find:stop'),
+  certProceed: invoke('cert:proceed'),
+  certBack: invoke('cert:back'),
+  getFilePath: (f)=>webUtils.getPathForFile(f),
+  onState: (callback) => on('state', callback),
+  onFocusOmnibox: (callback) => on('focus-omnibox', callback),
+  onOmniboxPick: (callback) => on('omnibox:pick', callback),
+  onFindShow: (callback) => on('find:show', callback),
+  onFindResult: (callback) => on('find:result', callback)
+});

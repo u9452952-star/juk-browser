@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+  <title>toast</title>
+  <style>
+    html,body{margin:0;height:100%;overflow:hidden;background:transparent;font:13px system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{display:grid;place-items:center;box-sizing:border-box;padding:14px}
+    #t{background:#202124d9;color:#fff;padding:10px 22px;border-radius:999px;box-shadow:0 3px 10px #0004;font-weight:550;max-width:100%;box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:1px solid #ffffff1f;backdrop-filter:blur(10px);animation:tin 3s cubic-bezier(.2,.9,.25,1) forwards}
+    @keyframes tin{0%{transform:translateX(120%);opacity:0}7%{transform:translateX(0);opacity:1}93%{transform:translateX(0);opacity:1}100%{transform:translateX(120%);opacity:0}}
+  </style>
+</head>
+<body>
+  <div id="t"></div>
+<script>
+const t=document.getElementById('t');
+function play(){
+  try{const p=JSON.parse(decodeURIComponent(location.hash.slice(1)||'{}'));t.textContent=p.text||'';}catch(e){}
+  t.style.animation='none'; void t.offsetWidth; t.style.animation='';
+}
+play();
+window.addEventListener('hashchange',play);
+</script>
+</body>
+</html>

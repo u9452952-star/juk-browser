@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' 'self'">
+  <title>downloads</title>
+  <style>
+    :root{--bg:#fff;--text:#202124;--muted:#71757c;--hover:#2021240b;--accent:#e43d46;--accent-fg:#e43d46;--on-accent:#fff;--accent-soft:#e43d461f;--border:#dfe2e7}
+    @media (prefers-color-scheme:dark){:root{--bg:#292c31;--text:#f3f4f6;--muted:#a9adb5;--hover:#ffffff12;--accent:#ff5a62;--accent-fg:#ff5a62;--on-accent:#fff;--accent-soft:#ff5a6220;--border:#3b3f46}}
+    html,body{margin:0;height:100%;overflow:hidden;background:transparent;font:13px system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
+    body{box-sizing:border-box;padding:12px}
+    .card{box-sizing:border-box;height:100%;background:var(--bg);border:1px solid var(--border);border-radius:14px;box-shadow:0 3px 10px #0003;display:flex;flex-direction:column;overflow:hidden}
+    .head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 8px;font-weight:650;font-size:13.5px}
+    #x{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:var(--muted);padding:0;background:transparent;border:0;cursor:pointer}
+    #x:hover{background:var(--accent-soft);color:var(--accent-fg)}
+    #x svg{width:12px;height:12px;display:block}
+    #list{flex:1;overflow-y:auto;padding:0 6px}
+    #list::-webkit-scrollbar{width:0}
+    .row{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;cursor:pointer}
+    .row:hover{background:var(--hover)}
+    .ico{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:8px;background:var(--accent-soft);color:var(--accent-fg)}
+    .ico svg{width:15px;height:15px;display:block}
+    .main{flex:1;min-width:0}
+    .name{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .meta{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    progress{width:100%;height:4px;margin-top:4px;accent-color:var(--accent)}
+    .act{display:flex;gap:4px;flex:0 0 auto}
+    .act button{border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:50%;cursor:pointer;display:grid;place-items:center;padding:0}
+    .act button:hover{background:var(--accent-soft);color:var(--accent-fg)}
+    .act button svg{width:13px;height:13px;display:block}
+    .empty{padding:18px;text-align:center;color:var(--muted)}
+    .foot{padding:6px;border-top:1px solid var(--border)}
+    #all{width:100%;border:0;background:transparent;color:var(--accent-fg);font:inherit;font-weight:600;padding:8px 16px;border-radius:12px;cursor:pointer}
+    #all:hover{background:var(--hover)}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="head"><span id="dlTitle">Загрузки</span><button id="x" title="Закрыть" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button></div>
+    <div id="list"></div>
+    <div class="foot"><button id="all">Показать все загрузки</button></div>
+  </div>
+<script src="i18n.js"></script>
+<script>
+const esc=(s='')=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=(n=0)=>{if(!n)return '0 Б';const k=1024,u=['Б','КБ','МБ','ГБ'],i=Math.min(Math.floor(Math.log(n)/Math.log(k)),3);return `${(n/k**i).toFixed(i?1:0)} ${u[i]}`};
+const fmtEta=s=>{s=Math.max(0,Math.round(s));if(s<60)return `${s} с`;const m=Math.floor(s/60),r=s%60;return r?`${m} мин ${r} с`:`${m} мин`};
+const FILE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
+const OPEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4L10 14"/><path d="M20 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5"/></svg>';
+const PAUSE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5v14M15 5v14"/></svg>';
+const PLAY='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5l12 7-12 7z"/></svg>';
+const STOP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>';
+let STATUS={progressing:'Загружается…',completed:'Завершено',cancelled:'Отменено',interrupted:'Прервано'};
+dl.onState(p=>{
+  const r=document.documentElement.style;
+  if(p.theme)for(const[k,v]of Object.entries({bg:'--bg',text:'--text',muted:'--muted',hover:'--hover',accent:'--accent',accentFg:'--accent-fg',onAccent:'--on-accent',accentSoft:'--accent-soft',border:'--border'}))r.setProperty(v,p.theme[k]);
+  const T=LANGS[p.lang]||LANGS.ru; const tt=k=>T[k]||LANGS.ru[k]||k;
+  STATUS={progressing:tt('stProgressing'),completed:tt('stCompleted'),cancelled:tt('stCancelled'),interrupted:tt('stInterrupted')};
+  document.getElementById('dlTitle').textContent=tt('downloads');
+  document.getElementById('all').textContent=tt('showAllDownloads');
+  const x=document.getElementById('x'); x.title=tt('closeBtn'); x.setAttribute('aria-label',tt('closeBtn'));
+  const items=p.items||[];
+  document.getElementById('list').innerHTML=items.length?items.map(x=>{
+    const pct=x.totalBytes>0?Math.round(x.receivedBytes/x.totalBytes*100):null;
+    const st=x.state==='progressing'&&x.paused?tt('stPaused'):(STATUS[x.state]||x.state);
+    const speed=x.state==='progressing'&&x.speed>0?` · ${fmt(x.speed)}/с`:'';
+    const eta=x.state==='progressing'&&x.speed>0&&x.totalBytes>0?` · ~${fmtEta((x.totalBytes-x.receivedBytes)/x.speed)}`:'';
+    return `<div class="row" data-id="${x.id}" data-state="${x.state}">
+      <span class="ico">${FILE}</span>
+      <div class="main"><div class="name">${esc(x.filename)}</div><div class="meta">${pct!==null?pct+'% · ':''}${st}${speed}${eta} · ${fmt(x.receivedBytes)}${x.totalBytes>0?' / '+fmt(x.totalBytes):''}</div>
+      ${x.state==='progressing'?(x.totalBytes>0?`<progress max="${x.totalBytes}" value="${x.receivedBytes||0}"></progress>`:'<progress></progress>'):''}</div>
+      <div class="act">${x.state==='progressing'?`<button data-a="pause" title="${x.paused?tt('resume'):tt('pause')}">${x.paused?PLAY:PAUSE}</button><button data-a="cancel" title="${tt('cancelDl')}">${STOP}</button>`:x.state==='completed'?`<button data-a="open" title="${tt('open')}">${OPEN}</button>`:''}</div>
+    </div>`;
+  }).join(''):`<div class="empty">${tt('noDownloads')}</div>`;
+  document.querySelectorAll('#list .row').forEach(rw=>rw.onclick=e=>{if(e.target.closest('button'))return;if(rw.dataset.state==='completed')dl.action(rw.dataset.id,'open')});
+  document.querySelectorAll('#list [data-a]').forEach(b=>b.onclick=e=>{e.stopPropagation();dl.action(b.closest('.row').dataset.id,b.dataset.a)});
+});
+document.getElementById('x').onclick=()=>dl.close();
+document.getElementById('all').onclick=()=>dl.openAll();
+dl.ready();
+</script>
+</body>
+</html>
