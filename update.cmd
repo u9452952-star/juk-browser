@@ -11,14 +11,21 @@ echo [Juk] Скачиваю обновления с GitHub...
 git fetch origin || (echo [Juk] Не удалось выполнить git fetch & pause & exit /b 1)
 git checkout -f -B dev origin/dev || (echo [Juk] Не удалось переключиться на ветку dev & pause & exit /b 1)
 
-if not exist node_modules (
-  echo [Juk] Устанавливаю зависимости...
-  call npm install --no-audit --no-fund || (echo [Juk] npm install завершился с ошибкой & pause & exit /b 1)
-) else (
-  git diff --quiet ORIG_HEAD HEAD -- package-lock.json package.json 2>nul || (
-    echo [Juk] Обновляю зависимости...
-    call npm install --no-audit --no-fund
+for /f %%i in ('git rev-parse HEAD:package-lock.json') do set NEWLOCK=%%i
+set OLDLOCK=
+if exist node_modules\.juk-lock set /p OLDLOCK=<node_modules\.juk-lock
+set NEED=
+if not exist node_modules\electron set NEED=1
+if not "%OLDLOCK%"=="%NEWLOCK%" set NEED=1
+if defined NEED (
+  echo [Juk] Устанавливаю или обновляю зависимости...
+  call npm install --no-audit --no-fund
+  if errorlevel 1 (
+    echo [Juk] npm install завершился с ошибкой
+    pause
+    exit /b 1
   )
+  >node_modules\.juk-lock echo %NEWLOCK%
 )
 
 echo [Juk] Запускаю браузер...
