@@ -2,17 +2,19 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' 'self'">
   <title>menu</title>
   <style>
     :root{--bg:#fff;--text:#202124;--muted:#71757c;--hover:#2021240b;--accent:#e43d46;--accent-fg:#e43d46;--on-accent:#fff;--accent-soft:#e43d461f;--border:#dfe2e7}
     @media (prefers-color-scheme:dark){:root{--bg:#292c31;--text:#f3f4f6;--muted:#a9adb5;--hover:#ffffff12;--accent:#ff5a62;--accent-fg:#ff5a62;--on-accent:#fff;--accent-soft:#ff5a6220;--border:#3b3f46}}
     html,body{margin:0;height:100%;overflow:hidden;background:transparent;font:13px system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
     body{box-sizing:border-box;padding:12px}
-    .card{box-sizing:border-box;height:100%;background:var(--bg);border:1px solid var(--border);border-radius:14px;box-shadow:0 3px 10px #0003;padding:6px;overflow-y:auto}
+    .card{box-sizing:border-box;height:100%;background:var(--bg);border:1px solid var(--border);border-radius:14px;box-shadow:0 3px 10px #0003;padding:6px;overflow-y:auto;animation:popIn .15s cubic-bezier(.2,.9,.25,1)}
+    @keyframes popIn{from{opacity:0;transform:scale(.97) translateY(-4px)}}
+    @media(prefers-reduced-motion:reduce){.card{animation:none}}
     .card::-webkit-scrollbar{width:0}
     .row{display:flex;align-items:center;justify-content:space-between;gap:14px;height:30px;padding:0 12px;border-radius:9px;cursor:pointer;user-select:none}
-    .row:hover:not(.disabled){background:var(--hover)}
+    .row:hover:not(.disabled),.row.sel:not(.disabled){background:var(--hover)}
     .row.disabled{opacity:.45;cursor:default}
     .row .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .accel{color:var(--muted);font-size:11px;flex:0 0 auto}
@@ -23,27 +25,51 @@
 </head>
 <body>
   <div class="card" id="card"></div>
+<script src="i18n.js"></script>
+<script src="popup-common.js"></script>
 <script>
-const esc=(s='')=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc=popupEsc;
 let state=null,stack=[];
 function currentItems(){let arr=state.items;for(const i of stack)arr=arr[i].children||[];return arr}
+function rowList(){return [...document.querySelectorAll('#card .row')]}
+function activate(r){
+  if(!r)return;
+  const items=currentItems();
+  if(r.dataset.back){stack.pop();render();return}
+  const it=items[Number(r.dataset.i)];
+  if(!it||it.enabled===false)return;
+  if(it.children){stack.push(Number(r.dataset.i));render();return}
+  menu.pick([...stack,Number(r.dataset.i)].join('.'));
+}
+function moveSel(d){
+  const rows=rowList().filter(r=>!r.classList.contains('disabled'));
+  if(!rows.length)return;
+  const cur=rows.findIndex(r=>r.classList.contains('sel'));
+  const i=cur<0?(d>0?0:rows.length-1):(cur+d+rows.length)%rows.length;
+  rows.forEach(r=>r.classList.remove('sel')); rows[i].classList.add('sel'); rows[i].scrollIntoView({block:'nearest'});
+}
 function render(){
   const items=currentItems();
   let html='';
   if(stack.length)html+=`<div class="row back" data-back="1"><span class="lbl">${esc('‹ '+(state.backLabel||'Назад'))}</span></div>`;
   html+=items.map((it,i)=>it.sep?'<div class="sep"></div>':`<div class="row${it.enabled===false?' disabled':''}" data-i="${i}"><span class="lbl">${esc(it.label)}</span>${it.children?'<span class="chev">▸</span>':it.accel?`<span class="accel">${esc(it.accel)}</span>`:''}</div>`).join('');
   document.getElementById('card').innerHTML=html;
-  document.querySelectorAll('.row').forEach(r=>r.onclick=()=>{
-    if(r.dataset.back){stack.pop();render();return}
-    const it=items[Number(r.dataset.i)];
-    if(!it||it.enabled===false)return;
-    if(it.children){stack.push(Number(r.dataset.i));render();return}
-    menu.pick([...stack,Number(r.dataset.i)].join('.'));
+  document.querySelectorAll('.row').forEach(r=>{
+    r.onclick=()=>activate(r);
+    r.onmouseenter=()=>{rowList().forEach(x=>x.classList.remove('sel'));r.classList.add('sel')};
   });
 }
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){e.preventDefault();moveSel(1)}
+  else if(e.key==='ArrowUp'){e.preventDefault();moveSel(-1)}
+  else if(e.key==='Enter'){e.preventDefault();activate(rowList().find(x=>x.classList.contains('sel'))||rowList().find(x=>!x.dataset.back))}
+  else if(e.key==='Escape'){e.preventDefault();if(stack.length){stack.pop();render()}else menu.close()}
+  else if(e.key==='ArrowRight'){const r=rowList().find(x=>x.classList.contains('sel'));if(r&&!r.dataset.back){const it=currentItems()[Number(r.dataset.i)];if(it&&it.children){stack.push(Number(r.dataset.i));render()}}}
+  else if(e.key==='ArrowLeft'){if(stack.length){stack.pop();render()}}
+});
 menu.onState(p=>{
-  const r=document.documentElement.style;
-  if(p.theme)for(const[k,v]of Object.entries({bg:'--bg',text:'--text',muted:'--muted',hover:'--hover',accent:'--accent',accentFg:'--accent-fg',onAccent:'--on-accent',accentSoft:'--accent-soft',border:'--border'}))r.setProperty(v,p.theme[k]);
+  const card=document.getElementById('card');popupRepop(card);
+  popupApplyTheme(p);
   state=p; stack=[]; render();
 });
 menu.ready();

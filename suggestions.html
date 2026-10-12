@@ -2,14 +2,17 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' 'self'">
   <title>suggestions</title>
   <style>
     :root{--bg:#fff;--text:#202124;--muted:#71757c;--hover:#2021240b;--accent:#e43d46;--border:#dfe2e7}
     @media (prefers-color-scheme:dark){:root{--bg:#292c31;--text:#f3f4f6;--muted:#a9adb5;--hover:#ffffff12;--accent:#ff5a62;--border:#3b3f46}}
     html,body{margin:0;height:100%;overflow:hidden;background:transparent;font:13px system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
     body{box-sizing:border-box;padding:12px}
-    .card{box-sizing:border-box;height:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 3px 10px #0003;padding:5px;overflow:hidden}
+    .card{box-sizing:border-box;height:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 3px 10px #0003;padding:5px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;animation:popIn .13s cubic-bezier(.2,.9,.25,1)}
+    .card::-webkit-scrollbar{width:0;height:0}
+    @keyframes popIn{from{opacity:0;transform:translateY(-4px)}}
+    @media(prefers-reduced-motion:reduce){.card{animation:none}}
     .sug{display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;cursor:pointer;box-sizing:border-box}
     .sug:hover,.sug.sel{background:var(--hover)}
     .sug .t{font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -18,11 +21,12 @@
 </head>
 <body>
 <div class="card" id="card"></div>
+<script src="i18n.js"></script>
+<script src="popup-common.js"></script>
 <script>
-const esc=(s='')=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc=popupEsc;
 sug.onRender(p=>{
-  const r=document.documentElement.style;
-  if(p.theme)for(const[k,v]of Object.entries({bg:'--bg',text:'--text',muted:'--muted',hover:'--hover',accent:'--accent',accentFg:'--accent-fg',onAccent:'--on-accent',accentSoft:'--accent-soft',border:'--border'}))r.setProperty(v,p.theme[k]);
+  popupApplyTheme(p);
   document.getElementById('card').innerHTML=p.items.map((x,i)=>`<div class="sug${i===p.selected?' sel':''}" data-i="${i}"><span class="t">${esc(x.title)}</span><span class="u">${esc(x.url)}</span></div>`).join('');
   document.querySelectorAll('.sug').forEach(el=>el.onmousedown=e=>{e.preventDefault();sug.pick(Number(el.dataset.i))});
 });

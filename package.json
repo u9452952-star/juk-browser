@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "check": "node --check main.js && node --check preload.js && node --check preload-page.js && node --check preload-prompt.js && node --check preload-suggestions.js && node --check preload-downloads.js && node --check preload-menu.js && node --check i18n.js && node --check renderer.js",
+    "check": "node --check main.js && node --check preload.js && node --check preload-page.js && node --check preload-prompt.js && node --check preload-suggestions.js && node --check preload-downloads.js && node --check preload-menu.js && node --check i18n.js && node --check popup-common.js && node --check renderer.js",
     "lint": "eslint .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
@@ -35,6 +35,7 @@
       "preload-downloads.js",
       "preload-menu.js",
       "i18n.js",
+      "popup-common.js",
       "renderer.js",
       "index.html",
       "suggestions.html",

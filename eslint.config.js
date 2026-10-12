@@ -43,5 +43,15 @@ module.exports = [
         module: 'writable' // i18n.js работает и в Node (module.exports)
       }
     }
+  },
+  {
+    files: ['popup-common.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: {
+        ...globals.browser,
+        LANGS: 'readonly' // словарь из i18n.js
+      }
+    }
   }
 ];

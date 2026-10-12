@@ -44,6 +44,7 @@ contextBridge.exposeInMainWorld('browser', {
   suggestions: invoke('omnibox:suggestions'),
   showSuggestions: invoke('omnibox:popup'),
   hideSuggestions: invoke('omnibox:popupHide'),
+  reopenClosed: invoke('tabs:reopenClosed'),
   setToolbarHeight: invoke('window:setToolbarHeight'),
   showAppMenu: invoke('menu:show'),
   showTabMenu: invoke('menu:tab'),
@@ -57,10 +58,19 @@ contextBridge.exposeInMainWorld('browser', {
   findStop: invoke('find:stop'),
   certProceed: invoke('cert:proceed'),
   certBack: invoke('cert:back'),
+  siteInfo: invoke('site:info'),
+  siteRevokePerm: invoke('site:revokePerm'),
+  zoomReset: invoke('nav:zoomReset'),
+  showBookmarkMenu: invoke('menu:bookmark'),
+  showBookmarkMore: invoke('menu:bookmarkMore'),
   getFilePath: (f)=>webUtils.getPathForFile(f),
   onState: (callback) => on('state', callback),
   onFocusOmnibox: (callback) => on('focus-omnibox', callback),
   onOmniboxPick: (callback) => on('omnibox:pick', callback),
   onFindShow: (callback) => on('find:show', callback),
-  onFindResult: (callback) => on('find:result', callback)
+  onFindResult: (callback) => on('find:result', callback),
+  onFindStep: (callback) => on('find:step', callback),
+  onTabsList: (callback) => on('tabs:list', callback),
+  onLinkHover: (callback) => on('link:hover', callback),
+  onBookmarkRename: (callback) => on('bookmark:rename', callback)
 });

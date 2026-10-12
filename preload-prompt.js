@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('pw', {
   answer: (save) => ipcRenderer.send('pw:answer', !!save),
   choose: (id) => ipcRenderer.send('pw:choose', id),
+  loginAnswer: (data) => ipcRenderer.send('pw:loginAnswer', data),
   ready: () => ipcRenderer.send('pw:ready'),
   onState: (callback) => {
     const listener = (_event, payload) => callback(payload);
