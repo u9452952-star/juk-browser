@@ -1,13 +1,13 @@
 {
   "name": "juk-browser",
   "version": "1.0.0",
-  "description": "Кроссплатформенный браузер на Electron",
-  "main": "main.js",
+  "description": "Juk Browser",
+  "main": "bootstrap.js",
   "author": "Juk Browser",
   "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "check": "node --check main.js && node --check preload.js && node --check preload-page.js && node --check preload-prompt.js && node --check preload-suggestions.js && node --check preload-downloads.js && node --check preload-menu.js && node --check i18n.js && node --check popup-common.js && node --check renderer.js",
+    "check": "node --check bootstrap.js && node --check main.js && node --check preload.js && node --check preload-page.js && node --check preload-prompt.js && node --check preload-suggestions.js && node --check preload-downloads.js && node --check preload-menu.js && node --check i18n.js && node --check popup-common.js && node --check renderer.js",
     "lint": "eslint .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
@@ -27,6 +27,7 @@
     "productName": "Juk Browser",
     "asar": true,
     "files": [
+      "bootstrap.js",
       "main.js",
       "preload.js",
       "preload-suggestions.js",
@@ -58,6 +59,7 @@
       }
     ],
     "win": {
+      "legalTrademarks": "Juk Browser",
       "target": [
         "nsis",
         "portable"
