@@ -17,7 +17,7 @@ module.exports = [
     }
   },
   {
-    files: ['main.js', 'preload*.js', 'eslint.config.js'],
+    files: ['bootstrap.js', 'main.js', 'preload*.js', 'eslint.config.js'],
     languageOptions: {
       sourceType: 'commonjs',
       globals: { ...globals.node }
